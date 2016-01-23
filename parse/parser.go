@@ -9,6 +9,7 @@ import (
 
 type Parser struct {
 	s    *Scanner
+	pos  int
 	curx float64
 	cury float64
 	buf  struct {
@@ -26,6 +27,7 @@ type point struct {
 func NewParser(r io.Reader) *Parser {
 	return &Parser{
 		s: NewScanner(r),
+		pos: 0,
 		curx: 0,
 		cury: 0,
 	}
@@ -33,8 +35,10 @@ func NewParser(r io.Reader) *Parser {
 
 func (p *Parser) Parse(runner types.ISegmentRunner) error {
 	for {
-		if err := p.scanCommand(runner); err != nil {
-			return err
+		if ok, err := p.scanCommand(runner); err != nil {
+			return fmt.Errorf("[pos: %d]: %s", p.pos - len(p.buf.lit), err)
+		} else if !ok {
+			return nil
 		}
 	}
 }
@@ -45,6 +49,7 @@ func (p *Parser) scan() (tok Token, lit string) {
 	// If we have a token on the buffer, then return it.
 	if p.buf.n != 0 {
 		p.buf.n = 0
+		p.pos += len(p.buf.lit)
 		return p.buf.tok, p.buf.lit
 	}
 
@@ -53,12 +58,16 @@ func (p *Parser) scan() (tok Token, lit string) {
 
 	// Save it to the buffer in case we unscan later.
 	p.buf.tok, p.buf.lit = tok, lit
+	p.pos += len(p.buf.lit)
 
 	return
 }
 
 // unscan pushes the previously read token back onto the buffer.
-func (p *Parser) unscan() { p.buf.n = 1 }
+func (p *Parser) unscan() {
+	p.buf.n = 1
+	p.pos -= len(p.buf.lit)
+}
 
 // scanIgnoreWhitespace scans the next non-whitespace token.
 func (p *Parser) scanIgnoreWhitespace() (tok Token, lit string) {
@@ -89,7 +98,7 @@ func (p *Parser) scanPoint() (*point, error) {
 	}
 
 	tok, lit := p.scanIgnoreWhitespace()
-	if tok != COMMA || tok != WS {
+	if tok != COMMA && tok != WS {
 		return nil, fmt.Errorf("found %q, expected whitespace between points", lit)
 	}
 

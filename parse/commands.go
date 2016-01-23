@@ -5,54 +5,57 @@ import (
 	"fmt"
 )
 
-func (p *Parser) scanCommand(runner types.ISegmentRunner) error {
+func (p *Parser) scanCommand(runner types.ISegmentRunner) (bool, error) {
 	tok, lit := p.scanIgnoreWhitespace()
+	if tok == EOF {
+		return false, nil
+	}
 	if tok != LETTERS {
-		return fmt.Errorf("found %q, expected command", lit)
+		return true, fmt.Errorf("found %q, expected command", lit)
 	}
 
 	switch lit {
 	case "f":
 	case "F":
-		return p.scanFillRule(runner)
+		return true, p.scanFillRule(runner)
 	case "m":
-		return p.scanMoveTo(runner, true)
+		return true, p.scanMoveTo(runner, true)
 	case "M":
-		return p.scanMoveTo(runner, false)
+		return true, p.scanMoveTo(runner, false)
 	case "l":
-		return p.scanLineTo(runner, true)
+		return true, p.scanLineTo(runner, true)
 	case "L":
-		return p.scanLineTo(runner, false)
+		return true, p.scanLineTo(runner, false)
 	case "h":
-		return p.scanHorizontalLineTo(runner, true)
+		return true, p.scanHorizontalLineTo(runner, true)
 	case "H":
-		return p.scanHorizontalLineTo(runner, false)
+		return true, p.scanHorizontalLineTo(runner, false)
 	case "v":
-		return p.scanVerticalLineTo(runner, true)
+		return true, p.scanVerticalLineTo(runner, true)
 	case "V":
-		return p.scanVerticalLineTo(runner, false)
+		return true, p.scanVerticalLineTo(runner, false)
 	case "c":
-		return p.scanCubicBezierTo(runner, true)
+		return true, p.scanCubicBezierTo(runner, true)
 	case "C":
-		return p.scanCubicBezierTo(runner, false)
+		return true, p.scanCubicBezierTo(runner, false)
 	case "s":
-		return p.scanSmoothCubicBezierTo(runner, true)
+		return true, p.scanSmoothCubicBezierTo(runner, true)
 	case "S":
-		return p.scanSmoothCubicBezierTo(runner, false)
+		return true, p.scanSmoothCubicBezierTo(runner, false)
 	case "q":
-		return p.scanQuadraticBezierTo(runner, true)
+		return true, p.scanQuadraticBezierTo(runner, true)
 	case "Q":
-		return p.scanQuadraticBezierTo(runner, false)
+		return true, p.scanQuadraticBezierTo(runner, false)
 	case "t":
-		return p.scanSmoothQuadraticBezierTo(runner, true)
+		return true, p.scanSmoothQuadraticBezierTo(runner, true)
 	case "T":
-		return p.scanSmoothQuadraticBezierTo(runner, false)
+		return true, p.scanSmoothQuadraticBezierTo(runner, false)
 	case "z":
 	case "Z":
-		return p.scanClosePath(runner)
+		return true, p.scanClosePath(runner)
 	}
 
-	return nil
+	return true, nil
 }
 
 func (p *Parser) scanFillRule(runner types.ISegmentRunner) error {

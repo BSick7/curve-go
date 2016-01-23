@@ -47,6 +47,8 @@ func (p *Parser) scanNumber() (float64, error) {
 		} else {
 			return 0, fmt.Errorf("found %q, expected exponential digits", lit2)
 		}
+	} else {
+		p.unscan()
 	}
 
 	if u, err := strconv.ParseFloat(buf.String(), 32); err != nil {
@@ -73,10 +75,9 @@ func (p *Parser) scanSpecialNumber(sign int) (float64, bool) {
 			return math.Inf(sign), true
 		} else if lit == "NaN" {
 			return math.NaN(), true
-		} else {
-			p.unscan()
 		}
 	}
+	p.unscan()
 	return 0, false
 }
 
