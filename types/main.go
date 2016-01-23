@@ -19,13 +19,13 @@ type ISegmentExecutor interface {
 type ISegmentRunner interface {
 	SetFillRule(fill_rule FillRule)
 	ClosePath()
-	MoveTo(x float32, y float32)
-	LineTo(x float32, y float32)
-	BezierCurveTo(cp1x float32, cp1y float32, cp2x float32, cp2y float32, x float32, y float32)
-	QuadraticCurveTo(cpx float32, cpy float32, x float32, y float32)
-	Arc(x float32, y float32, radius float32, startAngle float32, endAngle float32, anticlockwise bool)
-	ArcTo(x1 float32, y1 float32, x2 float32, y2 float32, radius float32)
-	Ellipse(cx float32, cy float32, rx float32, ry float32, rotation float32, startAngle float32, endAngle float32, antiClockwise bool)
+	MoveTo(x float64, y float64)
+	LineTo(x float64, y float64)
+	BezierCurveTo(cp1x float64, cp1y float64, cp2x float64, cp2y float64, x float64, y float64)
+	QuadraticCurveTo(cpx float64, cpy float64, x float64, y float64)
+	//Arc(x float64, y float64, radius float64, startAngle float64, endAngle float64, anticlockwise bool)
+	//ArcTo(x1 float64, y1 float64, x2 float64, y2 float64, radius float64)
+	EllipticalArc(rx float64, ry float64, phi float64, fa int8, fs int8, x float64, y float64)
 }
 
 type ISegment func(runner ISegmentRunner)
