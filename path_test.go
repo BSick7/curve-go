@@ -15,3 +15,9 @@ func TestPath(t *testing.T) {
 		return
 	}
 }
+
+func BenchmarkPath(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		NewPath(path1)
+	}
+}
